@@ -4,7 +4,7 @@
   "description": "task tracking application in MERN stack",
   "main": "index.js",
   "scripts": {
-    "start": "node ./backend/index.js"
+    "start": "concurrently \"cd ./backend && npm run dev\" \"cd ./frontend && npm start\""
   },
   "author": "samir dhoke",
   "license": "ISC",

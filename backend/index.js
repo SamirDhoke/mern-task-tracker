@@ -3,26 +3,29 @@ const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const router = require('./routes');
-
-
-const requestLogger = (req, res, next) => {
-    console.log('---');
-    console.log('METHOD', req.method);
-    console.log('URL', req.url);
-    console.log('body', req.body);
-
-    next();
-}
+const { requestLogger } = require('./utils');
 
 const config = {
-    URL: 'mongodb://localhost:27017/tasks',
+    URL: 'mongodb://db:27017/tasks',
     options : {}
 };
 
-mongoose
-    .connect(config.URL, config.options)
-    .then(() => console.log('connected successfully.'))
-    .catch(e => console.error(e.message));
+const connectDB = async (config) => {
+    let retries = 2;
+
+    while (retries) {    
+        try {
+            await mongoose.connect(config.URL);
+            console.log('connection successful!');
+            break;
+        } catch (e) {
+            console.log('connection failed.');
+            retries = retries - 1;
+        }
+    }
+}
+
+connectDB(config);
 
 const PORT = process.env.PORT || 3001;
 const MSG = `running on localhost:${PORT}`;
@@ -32,6 +35,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
+app.use(express.static('build'))
 app.use('/tasks', router);
+
+app.get('/*', function(req, res) {
+    res.sendFile(path.join(__dirname, '/build/index.html'), function(err) {
+       if (err) {
+          res.status(500).send(err)
+       }
+    })
+ })
 
 app.listen(PORT, () => console.log(MSG));

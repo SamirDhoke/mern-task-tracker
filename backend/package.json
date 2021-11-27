@@ -7,7 +7,7 @@
     "start": "node .",
     "dev": "nodemon .",
     "build:ui": "cd ../frontend && npm run build",
-    "build": "npm run build:ui && rm -r build && mv ../frontend/build ."
+    "build": "npm run build:ui && rm -r build || true && mv ../frontend/build ."
   },
   "keywords": [
     "react",
